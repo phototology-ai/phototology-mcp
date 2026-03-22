@@ -6,13 +6,13 @@ const apiKey = process.env.PHOTOTOLOGY_API_KEY;
 if (!apiKey) {
   // stderr only — stdout is reserved for JSON-RPC
   console.error('Error: PHOTOTOLOGY_API_KEY environment variable is required.');
-  console.error('Get your key at https://api.phototology.ai');
+  console.error('Get your key at https://api.phototology.com');
   process.exit(1);
 }
 
 const server = new McpServer({
   name: 'phototology',
-  version: '1.0.0',
+  version: '0.1.0',
 });
 
 registerTools(server, apiKey);
