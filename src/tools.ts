@@ -26,7 +26,10 @@ interface AnalyzeArgs {
  * Creates a singleton PhototologyClient for connection reuse across tool calls.
  */
 export function registerTools(server: McpServer, apiKey: string): void {
-  const client = new PhototologyClient({ apiKey });
+  const client = new PhototologyClient({
+    apiKey,
+    baseUrl: process.env.PHOTOTOLOGY_BASE_URL,
+  });
 
   // Cast needed: MCP SDK's registerTool generics hit TS2589 with complex Zod schemas
   const s = server as any;
