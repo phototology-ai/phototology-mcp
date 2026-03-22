@@ -1,6 +1,6 @@
 {
   "name": "@phototology/mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "MCP server for Phototology AI vision API",
   "license": "MIT",
   "repository": {
@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.27.0",
-    "@phototology/sdk": "workspace:*",
+    "@phototology/sdk": "^0.1.0",
     "zod": "^3.23.0"
   },
   "devDependencies": {
