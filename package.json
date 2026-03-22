@@ -2,6 +2,21 @@
   "name": "@phototology/mcp",
   "version": "0.1.0",
   "description": "MCP server for Phototology AI vision API",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nlakios/family-photo-chronology",
+    "directory": "packages/phototology-mcp"
+  },
+  "keywords": [
+    "phototology",
+    "mcp",
+    "model-context-protocol",
+    "ai",
+    "vision",
+    "photo-analysis",
+    "image-analysis"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
