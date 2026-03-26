@@ -9,7 +9,7 @@ MCP server for the [Phototology](https://api.phototology.com/v1/docs) AI vision 
 
 | Tool | Description |
 |------|-------------|
-| `analyze_photo` | Analyze a photo with AI vision. Returns structured data: dating, people, location, atmosphere, entities, and more. 15 composable modules, 4 presets. |
+| `analyze_photo` | Analyze a photo with AI vision. Returns structured data: dating, people, location, atmosphere, entities, and more. 14 composable modules, 8 presets. |
 | `list_modules` | List available analysis modules and presets. Call this first to discover capabilities. |
 
 ## Setup

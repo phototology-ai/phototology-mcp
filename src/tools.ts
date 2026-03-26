@@ -4,9 +4,9 @@ import { PhototologyClient } from '@phototology/sdk';
 
 const AnalyzeInputSchema = {
   imageUrl: z.string().url().describe('URL of the image to analyze'),
-  preset: z.enum(['photo-analysis', 'memorial', 'vehicle-condition', 'quick-scan'])
-    .default('photo-analysis')
-    .describe('Analysis preset. photo-analysis includes all modules.'),
+  preset: z.enum(['full-analysis', 'quick-scan', 'automobile', 'claims', 'property', 'ecommerce', 'memorial', 'vehicle-condition'])
+    .default('full-analysis')
+    .describe('Analysis preset. full-analysis includes all modules.'),
   modules: z.array(z.string()).optional()
     .describe('Specific modules to include (alternative to preset). Use list_modules to see options.'),
   includeEmbedding: z.boolean().default(false)
@@ -37,7 +37,7 @@ export function registerTools(server: McpServer, apiKey: string): void {
   s.registerTool(
     'analyze_photo',
     {
-      description: 'Analyze a photo using AI vision. Returns structured data: dating, people, location, atmosphere, entities, and more. 15 composable modules, 4 presets (photo-analysis, memorial, vehicle-condition, quick-scan). Use list_modules first to discover available modules.',
+      description: 'Analyze a photo using AI vision. Returns structured data: dating, people, location, atmosphere, entities, and more. 14 composable modules, 8 presets. Use list_modules first to discover available modules.',
       inputSchema: AnalyzeInputSchema,
       annotations: { readOnlyHint: true },
     },
