@@ -14,7 +14,7 @@
     "model-context-protocol",
     "ai",
     "vision",
-    "photo-analysis",
+    "photo-intelligence",
     "image-analysis"
   ],
   "main": "dist/index.js",

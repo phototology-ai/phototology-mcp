@@ -14,7 +14,7 @@ jest.mock('@phototology/sdk', () => ({
     }),
     modules: jest.fn().mockResolvedValue({
       modules: [{ name: 'dating', description: 'Date estimation', category: 'core', outputFields: ['estimatedDate'] }],
-      presets: [{ name: 'photo-analysis', description: 'Full analysis', modules: ['dating'] }],
+      presets: [{ name: 'full-analysis', description: 'Full analysis', modules: ['dating'] }],
     }),
   })),
 }));
