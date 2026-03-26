@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as readline from 'readline';
+import { PhototologyClient, AuthenticationError } from '@phototology/sdk';
 
 const HOME = process.env.HOME || process.env.USERPROFILE || '~';
 
@@ -129,7 +130,26 @@ export async function setupInteractive(): Promise<void> {
     console.error('\n  Warning: key doesn\'t start with pt_live_ or pt_test_ -- proceeding anyway.\n');
   }
 
-  console.error('\n  Which editor?');
+  // Validate the key against the API before writing config
+  console.error('  Verifying key...');
+  const testClient = new PhototologyClient({
+    apiKey,
+    baseUrl: process.env.PHOTOTOLOGY_BASE_URL,
+  });
+  try {
+    await testClient.modules();
+    console.error('  Key verified.\n');
+  } catch (err) {
+    if (err instanceof AuthenticationError) {
+      rl.close();
+      console.error('\n  Invalid API key. Check your key at https://api.phototology.com\n');
+      process.exit(1);
+    }
+    // Network errors, timeouts, etc. -- warn but don't block setup
+    console.error(`  Warning: could not verify key (${(err as Error).message}) -- writing config anyway.\n`);
+  }
+
+  console.error('  Which editor?');
   EDITORS.forEach((e, i) => console.error(`    ${i + 1}. ${e.name}`));
   console.error(`    ${EDITORS.length + 1}. All of the above`);
 

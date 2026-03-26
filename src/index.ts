@@ -1,5 +1,6 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { PhototologyClient, AuthenticationError } from '@phototology/sdk';
 import { registerTools } from './tools';
 import { setupInteractive } from './setup';
 
@@ -71,6 +72,19 @@ if (!apiKey) {
   });
 
   registerTools(server, apiKey);
+
+  // Verify the API key on startup -- warn but don't block (network may be down)
+  const verifyClient = new PhototologyClient({
+    apiKey,
+    baseUrl: process.env.PHOTOTOLOGY_BASE_URL,
+  });
+  verifyClient.modules().catch((err) => {
+    if (err instanceof AuthenticationError) {
+      console.error('  Error: PHOTOTOLOGY_API_KEY is invalid. Check your key at https://api.phototology.com');
+      process.exit(1);
+    }
+    console.error(`  Warning: could not verify API key (${(err as Error).message})`);
+  });
 
   const transport = new StdioServerTransport();
   server.connect(transport).catch((err) => {
