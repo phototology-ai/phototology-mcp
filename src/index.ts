@@ -68,7 +68,7 @@ if (!apiKey) {
 } else {
   const server = new McpServer({
     name: 'phototology',
-    version: '0.1.0',
+    version: '0.1.3',
   });
 
   registerTools(server, apiKey);
