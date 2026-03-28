@@ -66,4 +66,40 @@ export function registerTools(server: McpServer, apiKey: string): void {
       };
     },
   );
+
+  const LookupInputSchema = {
+    imageUrl: z.string().url().optional().describe('URL of the image to look up'),
+    sha256: z.string().length(64).optional().describe('SHA-256 hash for direct lookup (skip image download)'),
+  };
+
+  interface LookupArgs {
+    imageUrl?: string;
+    sha256?: string;
+  }
+
+  s.registerTool(
+    'lookup_photo',
+    {
+      description: 'Check if a photo has been previously analyzed and retrieve all known results. Provide either an image URL or a SHA-256 hash. Lookups are free and do not consume credits.',
+      inputSchema: LookupInputSchema,
+      annotations: { readOnlyHint: true },
+    },
+    async ({ imageUrl, sha256 }: LookupArgs) => {
+      if (!imageUrl && !sha256) {
+        return {
+          content: [{ type: 'text' as const, text: 'Error: Provide either imageUrl or sha256.' }],
+          isError: true,
+        };
+      }
+
+      const result = await client.lookup({
+        ...(imageUrl ? { images: [imageUrl] } : {}),
+        ...(sha256 ? { sha256 } : {}),
+      });
+
+      return {
+        content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
+      };
+    },
+  );
 }
