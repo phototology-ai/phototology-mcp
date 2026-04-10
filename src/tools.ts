@@ -42,14 +42,21 @@ export function registerTools(server: McpServer, apiKey: string): void {
       annotations: { readOnlyHint: true },
     },
     async ({ imageUrl, preset, modules, includeEmbedding }: AnalyzeArgs) => {
-      const result = await client.analyze({
-        imageUrl,
-        ...(modules ? { modules } : { preset }),
-        options: { includeEmbedding },
-      });
-      return {
-        content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
-      };
+      try {
+        const result = await client.analyze({
+          imageUrl,
+          ...(modules ? { modules } : { preset }),
+          options: { includeEmbedding },
+        });
+        return {
+          content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
+        };
+      } catch (err: unknown) {
+        return {
+          content: [{ type: 'text' as const, text: `Error: ${err instanceof Error ? err.message : String(err)}` }],
+          isError: true,
+        };
+      }
     },
   );
 
@@ -60,10 +67,17 @@ export function registerTools(server: McpServer, apiKey: string): void {
       annotations: { readOnlyHint: true },
     },
     async () => {
-      const result = await client.modules();
-      return {
-        content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
-      };
+      try {
+        const result = await client.modules();
+        return {
+          content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
+        };
+      } catch (err: unknown) {
+        return {
+          content: [{ type: 'text' as const, text: `Error: ${err instanceof Error ? err.message : String(err)}` }],
+          isError: true,
+        };
+      }
     },
   );
 
@@ -92,14 +106,21 @@ export function registerTools(server: McpServer, apiKey: string): void {
         };
       }
 
-      const result = await client.lookup({
-        ...(imageUrl ? { images: [imageUrl] } : {}),
-        ...(sha256 ? { sha256 } : {}),
-      });
+      try {
+        const result = await client.lookup({
+          ...(imageUrl ? { images: [imageUrl] } : {}),
+          ...(sha256 ? { sha256 } : {}),
+        });
 
-      return {
-        content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
-      };
+        return {
+          content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
+        };
+      } catch (err: unknown) {
+        return {
+          content: [{ type: 'text' as const, text: `Error: ${err instanceof Error ? err.message : String(err)}` }],
+          isError: true,
+        };
+      }
     },
   );
 }

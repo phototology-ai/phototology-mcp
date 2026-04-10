@@ -30,7 +30,7 @@ describe('registerTools', () => {
     const toolSpy = jest.spyOn(server, 'registerTool');
     registerTools(server, 'pt_test_abc123');
 
-    expect(toolSpy).toHaveBeenCalledTimes(2);
+    expect(toolSpy).toHaveBeenCalledTimes(3);
     expect(toolSpy.mock.calls[0][0]).toBe('analyze_photo');
     expect(toolSpy.mock.calls[1][0]).toBe('list_modules');
   });
