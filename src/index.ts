@@ -66,29 +66,33 @@ if (!apiKey) {
     process.exit(1);
   }
 } else {
+  (async () => {
   const server = new McpServer({
     name: 'phototology',
-    version: '0.1.3',
+    version: '0.1.4',
   });
 
   registerTools(server, apiKey);
 
-  // Verify the API key on startup -- warn but don't block (network may be down)
+  // Verify the API key before connecting transport to avoid mid-handshake crashes
   const verifyClient = new PhototologyClient({
     apiKey,
     baseUrl: process.env.PHOTOTOLOGY_BASE_URL,
   });
-  verifyClient.modules().catch((err) => {
+  try {
+    await verifyClient.modules();
+  } catch (err) {
     if (err instanceof AuthenticationError) {
       console.error('  Error: PHOTOTOLOGY_API_KEY is invalid. Check your key at https://api.phototology.com');
       process.exit(1);
     }
-    console.error(`  Warning: could not verify API key (${(err as Error).message})`);
-  });
+    console.error(`  Warning: could not verify API key (${(err as Error).message}). Continuing anyway.`);
+  }
 
   const transport = new StdioServerTransport();
   server.connect(transport).catch((err) => {
     console.error('Failed to connect MCP transport:', err);
     process.exit(1);
   });
+  })();
 }

@@ -17,12 +17,13 @@ Thin MCP server that exposes `@phototology/sdk` as two Model Context Protocol to
 
 `src/index.ts` — reads `PHOTOTOLOGY_API_KEY`, creates `McpServer` with stdio transport, calls `registerTools()`.
 
-`src/tools.ts` — creates one `PhototologyClient` singleton (shared across tool calls), registers two tools:
+`src/tools.ts` — creates one `PhototologyClient` singleton (shared across tool calls), registers three tools:
 
 | Tool | Description |
 |------|-------------|
 | `analyze_photo` | Wraps `client.analyze()`. Args: `imageUrl`, `preset`, `modules?`, `includeEmbedding`. |
 | `list_modules` | Wraps `client.modules()`. No args. |
+| `lookup_photo` | Wraps `client.lookup()`. Args: `imageUrl?`, `sha256?`. Free, no credits. |
 
 Tools are `readOnlyHint: true`. Results return as `{ content: [{ type: 'text', text: JSON }] }`.
 
@@ -40,6 +41,6 @@ Tools are `readOnlyHint: true`. Results return as `{ content: [{ type: 'text', t
 
 | Pattern | Reality |
 |---------|---------|
-| More than 2 tools | Only `analyze_photo` and `list_modules` |
+| More than 3 tools | Only `analyze_photo`, `list_modules`, and `lookup_photo` |
 | `McpServer` constructed with auth config | Auth is handled by the SDK (`apiKey` in client config) |
 | SSE or HTTP transport | Stdio only |
