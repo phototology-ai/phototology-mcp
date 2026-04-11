@@ -69,7 +69,7 @@ if (!apiKey) {
   (async () => {
   const server = new McpServer({
     name: 'phototology',
-    version: '0.1.4',
+    version: require('../package.json').version,
   });
 
   registerTools(server, apiKey);

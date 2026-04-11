@@ -84,6 +84,11 @@ function writeJsonConfig(editor: EditorConfig, apiKey: string): void {
 }
 
 function writeTomlConfig(editor: EditorConfig, apiKey: string): void {
+  if (!/^pt_(live|test)_[\w-]+$/.test(apiKey)) {
+    console.error('  Invalid API key format.');
+    process.exit(1);
+  }
+
   const section = `[mcp_servers.phototology]\ncommand = "npx"\nargs = ["-y", "@phototology/mcp"]\n\n[mcp_servers.phototology.env]\nPHOTOTOLOGY_API_KEY = "${apiKey}"\n`;
 
   let existing = '';
@@ -173,6 +178,6 @@ export async function setupInteractive(): Promise<void> {
     console.error(`    ${editor.configPath}  (${editor.name})`);
   }
   console.error('\n  Restart your editor to pick up the new MCP server.');
-  console.error('  Your agent now has two tools: analyze_photo and list_modules.\n');
+  console.error('  Your agent now has three tools: analyze_photo, list_modules, and lookup_photo.\n');
   console.error('  Docs: https://api.phototology.com/v1/docs\n');
 }
