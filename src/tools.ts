@@ -37,7 +37,7 @@ export function registerTools(server: McpServer, apiKey: string): void {
   s.registerTool(
     'analyze_photo',
     {
-      description: 'Analyze a photo using AI vision. Returns structured data: dating, people, location, atmosphere, entities, and more. 14 composable modules, 8 presets. Use list_modules first to discover available modules.',
+      description: 'Analyze a photo using AI vision. Returns structured data: dating, people, location, atmosphere, entities, and more. 15 composable lenses, 8 presets. Use list_modules first to discover available modules.',
       inputSchema: AnalyzeInputSchema,
       annotations: { readOnlyHint: true },
     },
