@@ -1,6 +1,36 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { PhototologyClient } from '@phototology/sdk';
+import { PhototologyClient, CreditExhaustedError } from '@phototology/sdk';
+
+/**
+ * Render an error thrown by the SDK as an MCP tool result.
+ *
+ * Credit exhaustion gets a human-readable message pointing to the purchase
+ * URL (per MCP spec, this is a tool execution error — `isError: true` —
+ * NOT a protocol-level error). All other errors fall through to the
+ * existing `Error: <message>` format.
+ */
+function renderToolError(err: unknown): {
+  content: Array<{ type: 'text'; text: string }>;
+  isError: true;
+} {
+  if (err instanceof CreditExhaustedError) {
+    const parts = [`Out of credits. You need ${err.creditsRequired} credits.`];
+    if (typeof err.resetsInDays === 'number') {
+      parts.push(`Your community credits reset in ${err.resetsInDays} days.`);
+    }
+    parts.push(`Buy credits at ${err.purchaseUrl}`);
+    return {
+      content: [{ type: 'text' as const, text: parts.join(' ') }],
+      isError: true,
+    };
+  }
+  const message = err instanceof Error ? err.message : String(err);
+  return {
+    content: [{ type: 'text' as const, text: `Error: ${message}` }],
+    isError: true,
+  };
+}
 
 const AnalyzeInputSchema = {
   imageUrl: z.string().url().describe('URL of the image to analyze'),
@@ -52,10 +82,7 @@ export function registerTools(server: McpServer, apiKey: string): void {
           content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
         };
       } catch (err: unknown) {
-        return {
-          content: [{ type: 'text' as const, text: `Error: ${err instanceof Error ? err.message : String(err)}` }],
-          isError: true,
-        };
+        return renderToolError(err);
       }
     },
   );
@@ -73,10 +100,7 @@ export function registerTools(server: McpServer, apiKey: string): void {
           content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
         };
       } catch (err: unknown) {
-        return {
-          content: [{ type: 'text' as const, text: `Error: ${err instanceof Error ? err.message : String(err)}` }],
-          isError: true,
-        };
+        return renderToolError(err);
       }
     },
   );
@@ -116,10 +140,7 @@ export function registerTools(server: McpServer, apiKey: string): void {
           content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
         };
       } catch (err: unknown) {
-        return {
-          content: [{ type: 'text' as const, text: `Error: ${err instanceof Error ? err.message : String(err)}` }],
-          isError: true,
-        };
+        return renderToolError(err);
       }
     },
   );
