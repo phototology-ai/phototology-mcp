@@ -9,7 +9,15 @@ jest.mock('@phototology/sdk', () => ({
       outputSchema: 'photo',
       output: { estimatedDate: { year: 1990 } },
       usage: { totalTokens: 100, estimatedCostUsd: 0.001, modulesUsed: ['dating'] },
-      meta: { requestId: 'req_test', processingTimeMs: 500, provider: 'test', promptHash: 'abc' },
+      meta: {
+        requestId: 'req_test',
+        processingTimeMs: 500,
+        provider: 'test',
+        promptHash: 'abc',
+        ai_generated: true,
+        model: 'gemini-2.0-flash',
+        vendor: 'google',
+      },
       warnings: [],
     }),
     modules: jest.fn().mockResolvedValue({
