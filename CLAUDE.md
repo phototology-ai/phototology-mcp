@@ -1,9 +1,11 @@
 # @phototology/mcp Development Protocol
-> **Version:** 0.1.1 | **Architecture:** MCP stdio server wrapping @phototology/sdk | **Updated:** 2026-04-10
+> **Version:** 1.0.0 | **Architecture:** MCP stdio server wrapping @phototology/sdk | **Updated:** 2026-04-17
 
 ## What This Is
 
-Thin MCP server that exposes `@phototology/sdk` as two Model Context Protocol tools. Published to npm; referenced in Claude Desktop / mcp.so configs. Binary: `phototology-mcp`.
+Thin MCP server that exposes `@phototology/sdk` as three Model Context Protocol tools (`analyze_photo`, `list_modules`, `lookup_photo`). Published to npm; referenced in Claude Desktop / mcp.so configs. Binary: `phototology-mcp`.
+
+**1.0.0 breaking change (2026-04-17):** `lookup_photo` returns the new Registry v2 shape — `photo.lenses` keyed map, not `analyses[]`. `analyze_photo` accepts a new `refresh?: boolean` to bypass the per-user-per-photo projection cache.
 
 ## Quick Start
 
