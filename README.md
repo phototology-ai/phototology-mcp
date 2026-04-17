@@ -11,9 +11,36 @@ MCP server for [Phototology](https://api.phototology.com/v1/docs), the harness f
 
 | Tool | Description |
 |------|-------------|
-| `analyze_photo` | Analyze a photo with AI vision. Returns structured data: dating, people, location, atmosphere, entities, and more. 16 composable lenses, 8 presets. Supports `refresh: boolean` to bypass the projection cache and re-run the LLM. |
-| `list_modules` | List available lenses and presets. Call this first to discover capabilities. |
+| `analyze_photo` | Analyze a photo with AI vision. Pick specific lenses via `modules: [...]` to bill less, or use a preset for bundled workflows. Supports `refresh: boolean` to bypass the projection cache and re-run the LLM. |
+| `list_modules` | List available lenses and presets with descriptions. Call this for runtime discovery. |
 | `lookup_photo` | Look up a photo's full analysis history by sha256 or perceptual hash. Free, no credits charged. Returns every lens ever run on the photo, keyed by lens name. |
+
+## Lens reference
+
+<!-- LENSES:START -->
+
+| Lens | Owned output fields |
+|------|---------------------|
+| `dating` | `estimatedDate`, `techAnchors`, `temporalMarkers`, `title`, `genre`, `caption`, `dateAnchors`, `season`, `holiday`, `event`, `visibleDates`, `reproduction` |
+| `people` | `physicalObservations`, `collectionDynamics`, `peopleCount` |
+| `location` | `location` |
+| `atmosphere` | `atmosphere`, `emotions`, `warmCaption`, `semanticDescription` |
+| `entities` | `entities` |
+| `accessibility` | `accessibility` |
+| `photo-quality` | `quality`, `visualFaults`, `rotation`, `documentClassification`, `scan` |
+| `text-content` | `textContent` |
+| `composition` | `composition` |
+| `moderation` | `moderation` |
+| `describe` | `describe` |
+| `condition` | `condition` |
+| `authenticity` | `authenticity` |
+| `color-palette` | `colorPalette` |
+| `automobile` | `automobile` |
+| `vehicle-condition` | `overallCondition`, `componentGrades`, `observations`, `accidentIndicators`, `photoQuality`, `missingViews`, `vehicleContext`, `photos`, `sellerSummary` |
+
+<!-- LENSES:END -->
+
+Pass any of these as `modules: [...]` on `analyze_photo`, or use a preset (`full-analysis`, `quick-scan`, `automobile`, `claims`, `property`, `ecommerce`, `memorial`, `vehicle-condition`) to bundle several. The preset enum on the tool schema is the authoritative list; new lenses appear here automatically on publish.
 
 ## Setup
 
@@ -157,7 +184,7 @@ Calling `lookup_photo` for the same photo later:
 - [TypeScript SDK](https://www.npmjs.com/package/@phototology/sdk) — `npm install @phototology/sdk`
 - [API Documentation](https://api.phototology.com/v1/docs)
 - [OpenAPI Spec](https://api.phototology.com/v1/openapi.json)
-- [GitHub](https://github.com/nlakios/family-photo-chronology/tree/main/packages/phototology-mcp)
+- [GitHub](https://github.com/phototology-ai/phototology-mcp)
 
 ## License
 

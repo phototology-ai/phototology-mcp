@@ -33,7 +33,7 @@
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "test": "jest --passWithNoTests",
-    "prepublishOnly": "pnpm build && node ../../scripts/check-publish-drift.mjs"
+    "prepublishOnly": "node ../../scripts/sync-readme-lens-table.mjs README.md && pnpm build && node ../../scripts/check-publish-drift.mjs"
   },
   "engines": {
     "node": ">=18.0.0"

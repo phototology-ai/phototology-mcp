@@ -1,8 +1,51 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { PhototologyClient, AuthenticationError } from '@phototology/sdk';
+import {
+  PhototologyClient,
+  AuthenticationError,
+  LENS_FIELDS,
+  PRESET_IDS,
+} from '@phototology/sdk';
 import { registerTools } from './tools';
 import { setupInteractive } from './setup';
+
+/**
+ * Server-level instructions returned in the MCP Initialize handshake.
+ * Every MCP client (Claude Desktop, Claude Code, Cursor, Gemini CLI,
+ * Windsurf, Codex, VS Code Copilot) surfaces this to its model as
+ * system-level context for how to use the tools on this server. Kept
+ * concise — this is prompt budget, not documentation.
+ */
+function buildServerInstructions(): string {
+  const lenses = Object.keys(LENS_FIELDS).join(', ');
+  const presets = PRESET_IDS.join(', ');
+  return [
+    'Phototology is a photo-analysis API with a per-key photo registry. Treat it as a "visual intelligence" tool: given a photo, return structured facts about it.',
+    '',
+    '## Tools on this server',
+    '- `analyze_photo` — run AI vision against an image. Bills credits.',
+    '- `lookup_photo` — check the registry for prior analysis by sha256 or pHash. Free, no credits.',
+    '- `list_modules` — enumerate lenses and presets at runtime, with descriptions.',
+    '',
+    '## Composable lenses',
+    `Current lenses: ${lenses}. Each owns a specific set of top-level output fields. Pass a subset via \`modules: [...]\` to save credits when you only need some of them.`,
+    '',
+    '## Presets',
+    `Bundled module sets: ${presets}. Use a preset when the workflow matches (e.g. \`memorial\` for tribute photos, \`automobile\` for vehicle analysis). Otherwise prefer explicit \`modules\` for precise billing.`,
+    '',
+    '## Delta billing (Registry v2)',
+    'Every analyze call is deduplicated against a per-user-per-photo projection. Re-running the same lens on the same photo bills zero credits. Practical implication:',
+    '- Before calling `analyze_photo`, if the user has already analyzed this image before, you can call `lookup_photo { sha256 }` (free) to see what\'s cached.',
+    '- When the user asks to "re-analyze" or "redo" or "refresh" a photo, pass `refresh: true` on `analyze_photo`. This bypasses the cache and re-bills all requested lenses.',
+    '- Surface `usage.creditsCharged` in the response back to the user when it is greater than zero so they see the cost.',
+    '',
+    '## Error handling',
+    'If you receive an MCP tool error with text starting "Out of credits", stop and show the purchase link — the user is out of credits and needs to buy more before retrying. Do not retry the same call.',
+    '',
+    '## Response shape',
+    'Analyze output is flat-keyed JSON — top-level keys are field names (e.g. `estimatedDate`, `peopleCount`, `atmosphere`), not lens names. Use `list_modules` to map fields back to their owning lens.',
+  ].join('\n');
+}
 
 const SETUP_GUIDE = `
   Phototology MCP Server -- AI Vision for Coding Assistants
@@ -70,10 +113,15 @@ if (!apiKey) {
   const mcpVersion = require('../package.json').version;
   const mcpUserAgent = `@phototology/mcp/${mcpVersion}`;
 
-  const server = new McpServer({
-    name: 'phototology',
-    version: mcpVersion,
-  });
+  const server = new McpServer(
+    {
+      name: 'phototology',
+      version: mcpVersion,
+    },
+    {
+      instructions: buildServerInstructions(),
+    },
+  );
 
   registerTools(server, apiKey, mcpUserAgent);
 

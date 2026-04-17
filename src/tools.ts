@@ -1,6 +1,16 @@
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { PhototologyClient, CreditExhaustedError } from '@phototology/sdk';
+import {
+  PhototologyClient,
+  CreditExhaustedError,
+  LENS_FIELDS,
+  PRESET_IDS,
+  type LensId,
+} from '@phototology/sdk';
+
+// Derive the Zod enum from SDK's authoritative lens list so adding a lens
+// there automatically updates MCP's validation without a second edit.
+const LENS_IDS = Object.keys(LENS_FIELDS) as [LensId, ...LensId[]];
 
 /**
  * Render an error thrown by the SDK as an MCP tool result.
@@ -34,11 +44,11 @@ function renderToolError(err: unknown): {
 
 const AnalyzeInputSchema = {
   imageUrl: z.string().url().describe('URL of the image to analyze'),
-  preset: z.enum(['full-analysis', 'quick-scan', 'automobile', 'claims', 'property', 'ecommerce', 'memorial', 'vehicle-condition'])
+  preset: z.enum([...PRESET_IDS] as [string, ...string[]])
     .default('full-analysis')
-    .describe('Analysis preset. full-analysis includes all modules.'),
-  modules: z.array(z.string()).optional()
-    .describe('Specific modules to include (alternative to preset). Use list_modules to see options.'),
+    .describe('Analysis preset. full-analysis runs every lens.'),
+  modules: z.array(z.enum(LENS_IDS)).optional()
+    .describe('Specific lenses to run (alternative to preset). Cheaper than preset when you only need a few. Valid values come from the enum; call list_modules for descriptions.'),
   includeEmbedding: z.boolean().default(false)
     .describe('Include 1408-dim embedding vector for similarity search'),
   refresh: z.boolean().optional()
@@ -48,7 +58,7 @@ const AnalyzeInputSchema = {
 interface AnalyzeArgs {
   imageUrl: string;
   preset: string;
-  modules?: string[];
+  modules?: LensId[];
   includeEmbedding: boolean;
   refresh?: boolean;
 }
@@ -71,7 +81,7 @@ export function registerTools(server: McpServer, apiKey: string, userAgent?: str
   s.registerTool(
     'analyze_photo',
     {
-      description: 'Analyze a photo using AI vision. Returns structured data: dating, people, location, atmosphere, entities, and more. 15 composable lenses, 8 presets. Use list_modules first to discover available modules.',
+      description: 'Analyze a photo using AI vision. Returns structured data per requested lens (dating, people, location, atmosphere, entities, and more). Pass specific lenses via `modules` to minimize credit cost, or use a preset for bundled workflows. Call list_modules to discover every available lens + preset.',
       inputSchema: AnalyzeInputSchema,
       annotations: { readOnlyHint: true },
     },

@@ -2,6 +2,11 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { registerTools } from '../src/tools';
 
 jest.mock('@phototology/sdk', () => ({
+  // Mirror the authoritative constants so tools.ts's module-level
+  // `Object.keys(LENS_FIELDS)` doesn't fail at import time. Keep this
+  // in sync with src/lens-fields.ts in @phototology/sdk.
+  LENS_FIELDS: { dating: ['estimatedDate'], people: ['peopleCount'] },
+  PRESET_IDS: ['full-analysis', 'quick-scan'],
   PhototologyClient: jest.fn().mockImplementation(() => ({
     analyze: jest.fn().mockResolvedValue({
       id: 'ana_test123',
