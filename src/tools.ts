@@ -41,6 +41,8 @@ const AnalyzeInputSchema = {
     .describe('Specific modules to include (alternative to preset). Use list_modules to see options.'),
   includeEmbedding: z.boolean().default(false)
     .describe('Include 1408-dim embedding vector for similarity search'),
+  refresh: z.boolean().optional()
+    .describe('Bypass the projection cache and re-run the LLM for all requested lenses. Cached lens outputs are reused by default.'),
 };
 
 interface AnalyzeArgs {
@@ -48,6 +50,7 @@ interface AnalyzeArgs {
   preset: string;
   modules?: string[];
   includeEmbedding: boolean;
+  refresh?: boolean;
 }
 
 /**
@@ -72,12 +75,13 @@ export function registerTools(server: McpServer, apiKey: string, userAgent?: str
       inputSchema: AnalyzeInputSchema,
       annotations: { readOnlyHint: true },
     },
-    async ({ imageUrl, preset, modules, includeEmbedding }: AnalyzeArgs) => {
+    async ({ imageUrl, preset, modules, includeEmbedding, refresh }: AnalyzeArgs) => {
       try {
         const result = await client.analyze({
           imageUrl,
           ...(modules ? { modules } : { preset }),
           options: { includeEmbedding },
+          ...(refresh !== undefined ? { refresh } : {}),
         });
         return {
           content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
