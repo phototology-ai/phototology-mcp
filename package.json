@@ -3,7 +3,7 @@
   "version": "1.0.1",
   "description": "MCP server for Phototology AI vision API",
   "license": "MIT",
-  "homepage": "https://github.com/phototology-ai/phototology-mcp#readme",
+  "homepage": "https://phototology.com",
   "bugs": {
     "url": "https://github.com/phototology-ai/phototology-mcp/issues"
   },
