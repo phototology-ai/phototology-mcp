@@ -140,6 +140,7 @@ export async function setupInteractive(): Promise<void> {
   const testClient = new PhototologyClient({
     apiKey,
     baseUrl: process.env.PHOTOTOLOGY_BASE_URL,
+    userAgent: `@phototology/mcp/${require('../package.json').version} (setup)`,
   });
   try {
     await testClient.modules();

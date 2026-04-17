@@ -67,17 +67,21 @@ if (!apiKey) {
   }
 } else {
   (async () => {
+  const mcpVersion = require('../package.json').version;
+  const mcpUserAgent = `@phototology/mcp/${mcpVersion}`;
+
   const server = new McpServer({
     name: 'phototology',
-    version: require('../package.json').version,
+    version: mcpVersion,
   });
 
-  registerTools(server, apiKey);
+  registerTools(server, apiKey, mcpUserAgent);
 
   // Verify the API key before connecting transport to avoid mid-handshake crashes
   const verifyClient = new PhototologyClient({
     apiKey,
     baseUrl: process.env.PHOTOTOLOGY_BASE_URL,
+    userAgent: mcpUserAgent,
   });
   try {
     await verifyClient.modules();
