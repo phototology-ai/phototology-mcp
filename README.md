@@ -1,6 +1,8 @@
 # @phototology/mcp
 
-MCP server for the [Phototology](https://api.phototology.com/v1/docs) AI vision API. Gives AI coding assistants the ability to analyze photos.
+**The harness MCP server. Analyze once. Remember forever.**
+
+MCP server for [Phototology](https://api.phototology.com/v1/docs), the harness for visual intelligence. Any MCP-speaking agent framework (Claude Code, Cursor, VS Code Copilot, custom) can call Phototology as a tool. Perceptual-hash registry means the second agent that asks about a photo gets the answer for free.
 
 [![npm version](https://img.shields.io/npm/v/@phototology/mcp)](https://www.npmjs.com/package/@phototology/mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
