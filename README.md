@@ -180,7 +180,7 @@ Three optional skills ship inside the package under `node_modules/@phototology/m
 
 - **`phototology:lookup-first`**: always check the registry before spending credits.
 - **`phototology:check-credits`**: pre-flight balance read before a big batch.
-- **`phototology:plan-shot`**: pick the cheapest lens subset for a specific question.
+- **`phototology:smart-stack`**: smart-pick the cheapest lens subset for a specific question.
 
 When installed, the agent will invoke them when appropriate via the Skill tool.
 

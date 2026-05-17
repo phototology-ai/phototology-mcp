@@ -1,12 +1,12 @@
 ---
-name: phototology:plan-shot
-description: Use when the user gives you a photo and a specific question. Picks the cheapest accurate subset of lenses, then runs analyze_photo with only those lenses.
+name: phototology:smart-stack
+description: Use when the user gives you a photo and a specific question. Smart-picks the cheapest accurate subset of lenses (a smart stack) and runs analyze_photo with only those lenses.
 ---
 
-# Phototology: Plan the Shot
+# Phototology: Smart Stack
 
 ## When to use
-Whenever the user has an image and a clear, narrow question. Picking 1–3 lenses instead of `stack: 'full-analysis'` saves ~13 credits per call.
+Whenever the user has an image and a clear, narrow question. Smart-stacking 1 to 3 lenses instead of `stack: 'full-analysis'` saves around 13 credits per call.
 
 ## Lens-to-question map (canonical)
 

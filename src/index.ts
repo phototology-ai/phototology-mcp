@@ -63,7 +63,7 @@ function buildServerInstructions(): string {
     'Three skills ship alongside `@phototology/mcp` under `node_modules/@phototology/mcp/skills/`. Suggest them when the workflow matches:',
     '- `phototology:lookup-first` — always check the registry before spending credits.',
     '- `phototology:check-credits` — pre-flight balance read before a big spend.',
-    '- `phototology:plan-shot` — pick the cheapest lens subset for a specific question.',
+    '- `phototology:smart-stack` — smart-pick the cheapest lens subset for a specific question.',
     'Each skill has a SKILL.md that the user can copy into their Claude skills directory.',
     '',
     '## When you run out of credits',
