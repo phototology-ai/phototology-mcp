@@ -181,8 +181,28 @@ Three optional skills ship inside the package under `node_modules/@phototology/m
 - **`phototology:lookup-first`**: always check the registry before spending credits.
 - **`phototology:check-credits`**: pre-flight balance read before a big batch.
 - **`phototology:smart-stack`**: smart-pick the cheapest lens subset for a specific question.
+- **`phototology:photo-shared`**: activate whenever the user shares, attaches, drops, or references an image. Routes the photo through Phototology for the cheapest accurate answer.
 
-When installed, the agent will invoke them when appropriate via the Skill tool.
+When installed, the agent invokes them when context matches.
+
+### Optional: auto-trigger on image attachment (Claude Code)
+
+If you want Claude Code to automatically hint at Phototology the moment you attach an image (no model discretion required), add this hook to `~/.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "image",
+        "command": "echo 'User shared an image. Consider phototology:photo-shared to route it through the registry-first analysis path.'"
+      }
+    ]
+  }
+}
+```
+
+The hook injects a system hint on every prompt containing an image, nudging the model toward the `phototology:photo-shared` skill before it picks anything else. Skip the hook if you prefer to let the model decide on its own.
 
 ## Lens reference
 
