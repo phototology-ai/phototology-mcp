@@ -5,7 +5,7 @@
 [![npm version](https://img.shields.io/npm/v/@phototology/mcp.svg)](https://www.npmjs.com/package/@phototology/mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![MCP spec](https://img.shields.io/badge/MCP-2025--06--18-7e22ce.svg)](https://modelcontextprotocol.io/specification/2025-06-18)
-[![Node](https://img.shields.io/badge/node-%3E%3D18-339933.svg)](https://nodejs.org)
+[![Node](https://img.shields.io/badge/node-%3E%3D20-339933.svg)](https://nodejs.org)
 
 MCP server for [Phototology](https://api.phototology.com/v1/docs), the visual-intelligence registry. Any MCP-speaking agent (Claude Code, Cursor, VS Code Copilot, Claude Desktop) calls Phototology as a tool. Photos are analyzed once, keyed by perceptual hash, then returned free forever to any future caller on the same account.
 
