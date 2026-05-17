@@ -2,7 +2,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { registerTools } from '../src/tools';
 
 jest.mock('@phototology/sdk', () => ({
-  // Mirror the authoritative constants so tools.ts's module-level
+  // Mirror the authoritative constants so tool files' module-level
   // `Object.keys(LENS_FIELDS)` doesn't fail at import time. Keep this
   // in sync with src/lens-fields.ts in @phototology/sdk.
   LENS_FIELDS: { dating: ['estimatedDate'], people: ['peopleCount'] },
@@ -29,6 +29,17 @@ jest.mock('@phototology/sdk', () => ({
       modules: [{ name: 'dating', description: 'Date estimation', category: 'core', outputFields: ['estimatedDate'] }],
       presets: [{ name: 'full-analysis', description: 'Full analysis', modules: ['dating'] }],
     }),
+    lookup: jest.fn().mockResolvedValue({
+      object: 'lookup',
+      results: {},
+      meta: { imagesSubmitted: 0, imagesMatched: 0, processingTimeMs: 1, requestId: 'req_l' },
+    }),
+    usage: jest.fn().mockResolvedValue({
+      tier: 'starter',
+      community: { balance: 1000, monthlyAllowance: 1000, resetsInDays: 30 },
+      purchased: { balance: 0 },
+      reserved: 0,
+    }),
   })),
 }));
 
@@ -39,13 +50,30 @@ describe('registerTools', () => {
     server = new McpServer({ name: 'test', version: '0.0.1' });
   });
 
-  it('registers analyze_photo and list_modules tools', () => {
+  it('registers all five tools in the expected order', () => {
     const toolSpy = jest.spyOn(server, 'registerTool');
     registerTools(server, 'pt_test_abc123');
 
-    expect(toolSpy).toHaveBeenCalledTimes(3);
-    expect(toolSpy.mock.calls[0][0]).toBe('analyze_photo');
-    expect(toolSpy.mock.calls[1][0]).toBe('list_modules');
+    expect(toolSpy).toHaveBeenCalledTimes(5);
+    const names = toolSpy.mock.calls.map((c) => c[0]);
+    expect(names).toEqual([
+      'analyze_photo',
+      'list_lenses',
+      'lookup_photo',
+      'get_credits',
+      'purchase_credits',
+    ]);
+  });
+
+  it('marks every tool readOnlyHint:true, destructiveHint:false', () => {
+    const toolSpy = jest.spyOn(server, 'registerTool');
+    registerTools(server, 'pt_test_abc123');
+
+    for (const call of toolSpy.mock.calls) {
+      const config = call[1] as { annotations?: Record<string, unknown> };
+      expect(config.annotations?.readOnlyHint).toBe(true);
+      expect(config.annotations?.destructiveHint).toBe(false);
+    }
   });
 
   it('creates a singleton PhototologyClient with the provided API key', () => {
