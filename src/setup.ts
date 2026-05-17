@@ -179,6 +179,6 @@ export async function setupInteractive(): Promise<void> {
     console.error(`    ${editor.configPath}  (${editor.name})`);
   }
   console.error('\n  Restart your editor to pick up the new MCP server.');
-  console.error('  Your agent now has three tools: analyze_photo, list_modules, and lookup_photo.\n');
+  console.error('  Your agent now has six tools: analyze_photo, analyze_batch, list_lenses, lookup_photo, get_credits, and purchase_credits.\n');
   console.error('  Docs: https://api.phototology.com/v1/docs\n');
 }

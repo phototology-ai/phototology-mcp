@@ -163,7 +163,7 @@ args = ["-y", "@phototology/mcp"]
 PHOTOTOLOGY_API_KEY = "pt_live_..."
 ```
 
-After editing the config, restart your editor. You should see 5 tools registered under `phototology`.
+After editing the config, restart your editor. You should see 6 tools registered under `phototology`.
 
 ## First 5 minutes
 
@@ -177,7 +177,7 @@ Try these prompts in order:
 
 ## Companion skills
 
-Three optional skills ship inside the package under `node_modules/@phototology/mcp/skills/`. Copy any of them into your Claude skills directory (`~/.claude/skills/<skill-name>/`) to install:
+Five optional skills ship inside the package under `node_modules/@phototology/mcp/skills/`. Copy any of them into your Claude skills directory (`~/.claude/skills/<skill-name>/`) to install:
 
 - **`phototology:lookup-first`**: always check the registry before spending credits (single-photo).
 - **`phototology:check-credits`**: pre-flight balance read before a big batch.

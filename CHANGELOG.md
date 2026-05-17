@@ -27,13 +27,13 @@ All notable changes to `@phototology/mcp` are tracked here. Format follows [Keep
   - `analyze_photo` now accepts `lenses: [...]` (preferred) and `stack: '...'` (preferred). The previous names `modules: [...]` and `preset: '...'` still work as deprecated aliases during the rename. The MCP translates them to the SDK's `modules` and `preset` internally; the SDK and API are unchanged.
 - Tool descriptions rewritten end-to-end per Anthropic's tool-design rules. Each description names the cost, when to use, what to chain with, and the response shape.
 - Server instructions (the system-level handshake context) rewritten to lead with the registry/persistence differentiator and the new pricing model (1¢/lens, lookups free, bespoke 5 credits + 1 per stacked lens, moderation free, 1,000 community credits/month free, packs at $10/$100/$1,000 for 1k/10k/100k credits, first-purchase 2x bonus, no subscriptions).
-- README rebuilt Context7-style: hero tagline, npx one-liner, Without/With contrast, 5-tool quick table with cost column, full pricing section, install snippets verified for 7 editors (Claude Code, Claude Desktop, Cursor, VS Code Copilot, Windsurf, Gemini CLI, Codex CLI), first-5-minutes walkthrough, companion skills, FAQ.
+- README rebuilt Context7-style: hero tagline, npx one-liner, Without/With contrast, 6-tool quick table with cost column, full pricing section, install snippets verified for 7 editors (Claude Code, Claude Desktop, Cursor, VS Code Copilot, Windsurf, Gemini CLI, Codex CLI), first-5-minutes walkthrough, companion skills, FAQ.
 
 ### Internal
 
 - `src/tools.ts` split into per-tool files under `src/tools/`. The historical `src/tools.ts` is now a re-export shim so existing imports keep working.
 - New `src/tools/errors.ts` centralizes `renderToolError()` and the structured-action shape.
-- Test coverage: 28 tests across 6 suites (up from 18 across 3). New: `errors.test.ts`, `get-credits.test.ts`, `purchase-credits.test.ts`. Updated: `tools.test.ts` asserts the new 5-tool registration and the annotations on each.
+- Test coverage: 28 tests across 6 suites (up from 18 across 3). New: `errors.test.ts`, `get-credits.test.ts`, `purchase-credits.test.ts`. Updated: `tools.test.ts` asserts the new 6-tool registration and the annotations on each.
 
 ### SDK companion
 
