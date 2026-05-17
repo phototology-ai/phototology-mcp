@@ -1,0 +1,39 @@
+---
+name: phototology:check-credits
+description: Use when the user asks about their Phototology credit balance, when you are about to run a large batch of analyze calls, or when you want to warn the user before an expensive spend.
+---
+
+# Phototology: Check Credits
+
+## When to use
+- The user asks "how many credits do I have left?" or any balance question.
+- Before any batch of more than ~5 `analyze_photo` calls.
+- Before a `bespoke` analyze call (5 credits).
+- Before the `full-analysis` stack (~16 credits per photo).
+
+## Steps
+
+1. Call `get_credits`. Free, instant.
+2. Report the balance plainly. Example:
+   > You have **978 credits** available (980 community + 0 purchased − 2 reserved). Your monthly community refill arrives in 14 days.
+3. If `community.balance + purchased.balance - reserved < estimated cost of the next operation`:
+   - Tell the user how many credits the operation will need.
+   - Offer three options: **(a)** proceed anyway (will hit the out-of-credits error), **(b)** reduce scope to fewer lenses, or **(c)** buy more credits.
+   - If they pick (c), call `purchase_credits` and surface the URL.
+
+## Estimating cost
+- `analyze_photo` with N `lenses` = N credits (1 per lens).
+- `analyze_photo` with `stack: 'full-analysis'` = ~16 credits (every lens).
+- `analyze_photo` with bespoke extraction = 5 credits + 1 per additional stacked lens.
+- `analyze_photo` re-running cached lenses on the same photo = 0 credits (delta billing).
+- `lookup_photo`, `list_lenses`, `get_credits`, `purchase_credits` = 0 credits.
+
+## Pricing facts you can quote
+- 1 credit = $0.01.
+- Every account gets 1,000 community credits per month, free, no card. They spend FIRST.
+- Packs (all at $0.01/credit, no volume discount):
+  - Starter: 1,000 credits, $10
+  - Pro: 10,000 credits, $100
+  - Business: 100,000 credits, $1,000
+- First purchase doubles: a user buying their first pack ever gets 2x credits (Starter $10 → 2,000 credits the first time).
+- No subscriptions. Pay-as-you-go via packs only.
