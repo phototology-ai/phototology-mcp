@@ -7,6 +7,12 @@
 [![MCP spec](https://img.shields.io/badge/MCP-2025--06--18-7e22ce.svg)](https://modelcontextprotocol.io/specification/2025-06-18)
 [![Node](https://img.shields.io/badge/node-%3E%3D20-339933.svg)](https://nodejs.org)
 
+[![Install in VS Code](https://img.shields.io/badge/Install%20in-VS%20Code-007ACC?style=flat-square&logo=visualstudiocode&logoColor=white)](vscode:mcp/install?%7B%22name%22%3A%22phototology%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40phototology%2Fmcp%22%5D%2C%22env%22%3A%7B%22PHOTOTOLOGY_API_KEY%22%3A%22%22%7D%7D)
+[![Install in VS Code Insiders](https://img.shields.io/badge/Install%20in-VS%20Code%20Insiders-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](vscode-insiders:mcp/install?%7B%22name%22%3A%22phototology%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40phototology%2Fmcp%22%5D%2C%22env%22%3A%7B%22PHOTOTOLOGY_API_KEY%22%3A%22%22%7D%7D)
+[![Install in Cursor](https://img.shields.io/badge/Install%20in-Cursor-000000?style=flat-square&logoColor=white)](cursor://anysphere.cursor-deeplink/mcp/install?name=phototology&config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsIkBwaG90b3RvbG9neS9tY3AiXSwiZW52Ijp7IlBIT1RPVE9MT0dZX0FQSV9LRVkiOiIifX0=)
+
+> Click an install button to add the MCP server in one step. You'll be prompted to fill in `PHOTOTOLOGY_API_KEY` after install. For other editors, see the [Setup section](#setup-pick-your-editor) below.
+
 MCP server for [Phototology](https://api.phototology.com/v1/docs), the visual-intelligence registry. Any MCP-speaking agent (Claude Code, Cursor, VS Code Copilot, Claude Desktop) calls Phototology as a tool. Photos are analyzed once, keyed by perceptual hash, then returned free forever to any future caller on the same account.
 
 ```bash
