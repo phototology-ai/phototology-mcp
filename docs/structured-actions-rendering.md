@@ -45,7 +45,7 @@ The two payloads carry the same information. The text fallback is human-readable
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-The URL in the text becomes a clickable link in most clients. The `structuredContent` panel can be expanded to reveal raw JSON, but no client (today, as of MCP spec 2025-06-18) standardizes the `actions[].type === 'open_url'` shape as a rendering hint.
+The URL in the text becomes a clickable link in most clients. The `structuredContent` panel can be expanded to reveal raw JSON, but no client (today, as of MCP spec 2025-11-25) standardizes the `actions[].type === 'open_url'` shape as a rendering hint.
 
 ## What we'd see if a client implemented an `actions` convention
 
@@ -64,7 +64,7 @@ The URL in the text becomes a clickable link in most clients. The `structuredCon
 
 ## Spec context
 
-MCP 2025-06-18 defines tool results as:
+MCP 2025-11-25 defines tool results as:
 
 - `content: Array<{ type: "text" | "image" | "audio" | "resource_link" | "resource", … }>` — standardized. Every client renders the text type.
 - `structuredContent?: Record<string, unknown>` — free-form JSON object, optionally constrained by the tool's `outputSchema`. The spec does NOT define an `actions` array or `open_url` discriminator. We invented the convention.

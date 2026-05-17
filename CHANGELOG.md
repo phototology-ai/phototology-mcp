@@ -9,7 +9,7 @@ All notable changes to `@phototology/mcp` are tracked here. Format follows [Keep
 - `get_credits` tool. Free. Reads the dual-pool balance (`community.balance + purchased.balance - reserved`) via the SDK's new `client.usage()` method. Use before any analyze loop to warn the user before spending.
 - `purchase_credits` tool. Free. Returns a deep-link to the Phototology wallet with `utm_source=mcp`. The tool description teaches the new pack catalog and the first-purchase 2x bonus.
 - `analyze_batch` tool. Analyze 1 to 200 INDEPENDENT photos in a single call. Internally bulk-looks-up against the registry (chunked into 50s, free), serves cache hits at 0 credits, runs per-photo analyze with bounded concurrency (5 in flight) for the misses. Returns per-photo outcomes plus `totalCacheHits`, `totalAnalyzed`, `totalCreditsCharged`, and `estimatedCreditsSaved` so the registry's value is visible. For thousands of photos, the agent loops the tool in slices of 200.
-- Structured `actions` payload on `CreditExhaustedError`. Rich-rendering MCP clients (Claude Code, Cursor, future Claude.ai) now receive a typed `open_url` action alongside the text fallback, per the MCP 2025-06-18 spec. Legacy clients keep seeing the URL in the text.
+- Structured `actions` payload on `CreditExhaustedError`. Rich-rendering MCP clients (Claude Code, Cursor, future Claude.ai) now receive a typed `open_url` action alongside the text fallback. Built against MCP spec 2025-11-25. Legacy clients keep seeing the URL in the text.
 - Five companion skills shipped under `node_modules/@phototology/mcp/skills/`:
   - `phototology:lookup-first` — always check the registry before spending credits (single photo).
   - `phototology:check-credits` — pre-flight balance read before a big batch.

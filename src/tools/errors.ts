@@ -22,7 +22,7 @@ interface RenderedError {
  * Render an SDK error as an MCP tool execution result.
  *
  * Credit exhaustion gets a human-readable message AND a structured `actions`
- * payload (MCP 2025-06-18 spec) so clients can render a button. Clients
+ * payload (per MCP spec 2025-11-25) so clients can render a button. Clients
  * without structured-content support still see the URL in the text fallback.
  *
  * All other errors fall through to the existing `Error: <message>` format.

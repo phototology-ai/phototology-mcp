@@ -4,7 +4,7 @@
 
 [![npm version](https://img.shields.io/npm/v/@phototology/mcp.svg)](https://www.npmjs.com/package/@phototology/mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
-[![MCP spec](https://img.shields.io/badge/MCP-2025--06--18-7e22ce.svg)](https://modelcontextprotocol.io/specification/2025-06-18)
+[![MCP spec](https://img.shields.io/badge/MCP-2025--11--25-7e22ce.svg)](https://modelcontextprotocol.io/specification/2025-11-25)
 [![Node](https://img.shields.io/badge/node-%3E%3D20-339933.svg)](https://nodejs.org)
 
 [![Install in VS Code](https://img.shields.io/badge/Install%20in-VS%20Code-007ACC?style=flat-square&logo=visualstudiocode&logoColor=white)](vscode:mcp/install?%7B%22name%22%3A%22phototology%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22%40phototology%2Fmcp%22%5D%2C%22env%22%3A%7B%22PHOTOTOLOGY_API_KEY%22%3A%22%22%7D%7D)
