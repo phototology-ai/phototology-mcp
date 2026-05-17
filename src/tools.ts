@@ -7,7 +7,6 @@ import {
   PRESET_IDS,
   type LensId,
 } from '@phototology/sdk';
-import { trackMcpTool } from './posthog';
 
 // Derive the Zod enum from SDK's authoritative lens list so adding a lens
 // there automatically updates MCP's validation without a second edit.
@@ -87,7 +86,6 @@ export function registerTools(server: McpServer, apiKey: string, userAgent?: str
       annotations: { readOnlyHint: true },
     },
     async ({ imageUrl, preset, modules, includeEmbedding, refresh }: AnalyzeArgs) => {
-      const start = Date.now();
       try {
         const result = await client.analyze({
           imageUrl,
@@ -95,13 +93,10 @@ export function registerTools(server: McpServer, apiKey: string, userAgent?: str
           options: { includeEmbedding },
           ...(refresh !== undefined ? { refresh } : {}),
         });
-        trackMcpTool({ apiKey, tool: 'analyze_photo', durationMs: Date.now() - start, success: true });
         return {
           content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
         };
       } catch (err: unknown) {
-        const errorCode = err instanceof CreditExhaustedError ? 'credit_exhausted' : 'error';
-        trackMcpTool({ apiKey, tool: 'analyze_photo', durationMs: Date.now() - start, success: false, errorCode });
         return renderToolError(err);
       }
     },
@@ -114,15 +109,12 @@ export function registerTools(server: McpServer, apiKey: string, userAgent?: str
       annotations: { readOnlyHint: true },
     },
     async () => {
-      const start = Date.now();
       try {
         const result = await client.modules();
-        trackMcpTool({ apiKey, tool: 'list_modules', durationMs: Date.now() - start, success: true });
         return {
           content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
         };
       } catch (err: unknown) {
-        trackMcpTool({ apiKey, tool: 'list_modules', durationMs: Date.now() - start, success: false, errorCode: 'error' });
         return renderToolError(err);
       }
     },
@@ -146,9 +138,7 @@ export function registerTools(server: McpServer, apiKey: string, userAgent?: str
       annotations: { readOnlyHint: true },
     },
     async ({ imageUrl, sha256 }: LookupArgs) => {
-      const start = Date.now();
       if (!imageUrl && !sha256) {
-        trackMcpTool({ apiKey, tool: 'lookup_photo', durationMs: 0, success: false, errorCode: 'missing_input' });
         return {
           content: [{ type: 'text' as const, text: 'Error: Provide either imageUrl or sha256.' }],
           isError: true,
@@ -160,13 +150,11 @@ export function registerTools(server: McpServer, apiKey: string, userAgent?: str
           ...(imageUrl ? { images: [imageUrl] } : {}),
           ...(sha256 ? { sha256 } : {}),
         });
-        trackMcpTool({ apiKey, tool: 'lookup_photo', durationMs: Date.now() - start, success: true });
 
         return {
           content: [{ type: 'text' as const, text: JSON.stringify(result, null, 2) }],
         };
       } catch (err: unknown) {
-        trackMcpTool({ apiKey, tool: 'lookup_photo', durationMs: Date.now() - start, success: false, errorCode: 'error' });
         return renderToolError(err);
       }
     },

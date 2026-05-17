@@ -8,7 +8,6 @@ import {
 } from '@phototology/sdk';
 import { registerTools } from './tools';
 import { setupInteractive } from './setup';
-import { shutdownPostHog } from './posthog';
 
 /**
  * Server-level instructions returned in the MCP Initialize handshake.
@@ -147,12 +146,5 @@ if (!apiKey) {
     console.error('Failed to connect MCP transport:', err);
     process.exit(1);
   });
-
-  // Flush any buffered PostHog events when the client disconnects (stdin
-  // close) or the process is asked to terminate. Opt-in telemetry —
-  // shutdown is a no-op when PHOTOTOLOGY_MCP_POSTHOG_KEY is unset.
-  process.stdin.on('end', () => { void shutdownPostHog(); });
-  process.on('SIGTERM', () => { void shutdownPostHog().then(() => process.exit(0)); });
-  process.on('SIGINT', () => { void shutdownPostHog().then(() => process.exit(0)); });
   })();
 }

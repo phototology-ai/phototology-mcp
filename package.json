@@ -41,7 +41,6 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.27.0",
     "@phototology/sdk": "workspace:*",
-    "posthog-node": "^5.34.2",
     "zod": "^3.23.0"
   },
   "devDependencies": {
