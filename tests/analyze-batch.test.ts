@@ -147,7 +147,7 @@ describe('analyze_batch tool', () => {
     expect(mockAnalyze).toHaveBeenCalled();
   });
 
-  it('chunks lookup into batches of 50 and calls analyze per-photo for large jobs', async () => {
+  it('runs per-URL lookup + per-photo analyze for large jobs (no ordering assumption)', async () => {
     mockLookup.mockResolvedValue(emptyLookupResp());
     mockAnalyze.mockResolvedValue(freshAnalyzeResp(1));
 
@@ -162,10 +162,14 @@ describe('analyze_batch tool', () => {
 
     expect(result.isError).toBeFalsy();
 
-    // Lookup is chunked at 50: 50 + 50 + 20 = 3 calls.
-    expect(mockLookup).toHaveBeenCalledTimes(3);
-    const lookupChunkSizes = mockLookup.mock.calls.map((c) => c[0].images.length).sort();
-    expect(lookupChunkSizes).toEqual([20, 50, 50]);
+    // Per-URL lookup: one call per image, NOT batched. This avoids
+    // depending on the API to preserve input order in batched results.
+    // Lookups are free; concurrency is bounded inside the tool.
+    expect(mockLookup).toHaveBeenCalledTimes(120);
+    for (const call of mockLookup.mock.calls) {
+      // Each lookup is a single-image request.
+      expect(call[0].images).toHaveLength(1);
+    }
 
     // Analyze runs once per photo (empty lookup => all 120 are misses).
     expect(mockAnalyze).toHaveBeenCalledTimes(120);

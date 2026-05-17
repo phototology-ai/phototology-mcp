@@ -1,4 +1,4 @@
-import { CreditExhaustedError } from '@phototology/sdk';
+import { CreditExhaustedError, AuthenticationError } from '@phototology/sdk';
 
 /**
  * Action object embedded in `structuredContent` so MCP clients that support
@@ -33,14 +33,20 @@ export function renderToolError(err: unknown): RenderedError {
     if (typeof err.resetsInDays === 'number') {
       lines.push(`Your community credits reset in ${err.resetsInDays} days.`);
     }
-    lines.push(`Buy credits at ${err.purchaseUrl}`);
+    // Surface the first-purchase 2x conversion lever to users who've never
+    // bought before. Backend tracks first_purchase_bonus_granted globally;
+    // any user who lands here for the first time gets 2x credits on whichever
+    // pack they pick.
+    lines.push(
+      'Buy credits at ' + err.purchaseUrl + ' — first purchase doubles, so Starter $10 buys 2,000 credits the first time.',
+    );
     return {
       content: [{ type: 'text' as const, text: lines.join(' ') }],
       structuredContent: {
         actions: [
           {
             type: 'open_url',
-            label: 'Buy credits in your Phototology wallet',
+            label: 'Buy credits in your Phototology wallet (first purchase doubles)',
             url: err.purchaseUrl,
           },
         ],
@@ -48,6 +54,23 @@ export function renderToolError(err: unknown): RenderedError {
       isError: true,
     };
   }
+
+  // Auth-failure polish: agents calling get_credits / lookup_photo with an
+  // anonymous test key (no userId attached) get a clearer hint than the raw
+  // SDK message. The platform-API endpoints involved require a real account.
+  if (err instanceof AuthenticationError) {
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text:
+            'Phototology auth failed (' + err.message + '). This usually means the API key has no user account attached (anonymous `pt_test_` keys are sandbox-only and cannot read credit balance or registry history). Create a real key at https://api.phototology.com to use balance + lookup endpoints.',
+        },
+      ],
+      isError: true,
+    };
+  }
+
   const message = err instanceof Error ? err.message : String(err);
   return {
     content: [{ type: 'text' as const, text: `Error: ${message}` }],

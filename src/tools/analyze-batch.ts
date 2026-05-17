@@ -7,10 +7,17 @@ const LENS_IDS = Object.keys(LENS_FIELDS) as [LensId, ...LensId[]];
 
 /** Hard cap per tool call. For larger jobs, the agent loops the tool. */
 const MAX_BATCH = 200;
-/** Per-API-call cap for lookup. Matches server-side limit. */
-const LOOKUP_CHUNK = 50;
-/** Concurrent analyze calls in flight. Conservative — respects per-key rate limits. */
-const ANALYZE_CONCURRENCY = 5;
+/**
+ * Concurrent analyze calls in flight.
+ *
+ * Generous by design: the API rate limiter is flat at 600 RPM per user
+ * (2026-05-17), so 25-concurrent analyze calls is comfortably under the
+ * cap and lets the agent burn through a batch fast. Tighten only if we
+ * see real rate-limit pushback at this concurrency.
+ */
+const ANALYZE_CONCURRENCY = 25;
+/** Concurrent lookup calls in flight (free, cheap, generous). */
+const LOOKUP_CONCURRENCY = 20;
 
 const BatchInputSchema = {
   imageUrls: z.array(z.string().url()).min(1).max(MAX_BATCH)
@@ -47,12 +54,6 @@ interface BatchPayload {
   totalCreditsCharged: number;
   estimatedCreditsSaved: number;
   results: PhotoOutcome[];
-}
-
-function chunk<T>(arr: T[], size: number): T[][] {
-  const out: T[][] = [];
-  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
-  return out;
 }
 
 /** Run an async map with bounded concurrency, preserving input order. */
@@ -128,34 +129,39 @@ export function registerAnalyzeBatch(server: McpServer, client: PhototologyClien
       const outcomes: PhotoOutcome[] = imageUrls.map((url) => ({ imageUrl: url, source: 'fresh' }));
 
       try {
-        // Step 1: bulk lookup, unless caller asked for a fresh re-run.
-        // Lookup chunks are 50 images per server call; lookup is free.
+        // Step 1: per-URL lookup with bounded concurrency.
+        //
+        // Why per-URL instead of batched: the API's bulk-lookup response is
+        // keyed by sha256 and does NOT echo the source URL. Mapping URL ->
+        // cache entry from a batched response requires trusting the API to
+        // preserve input order in its result object — an invariant the
+        // OpenAPI spec doesn't formally promise. Per-URL lookups give a
+        // deterministic mapping (one input URL -> one result entry) at the
+        // cost of N HTTP roundtrips. Lookups are free + fast (~3ms each);
+        // at LOOKUP_CONCURRENCY=20, a 200-image lookup pass completes in
+        // ~30ms wall time.
         const urlToCache = new Map<string, { sha256: string; lensesOutput: Record<string, unknown> }>();
         const requestedLensList = lenses ?? null;
 
         if (!refresh) {
-          for (const lookChunk of chunk(imageUrls, LOOKUP_CHUNK)) {
-            const lookupResp = await client.lookup({ images: lookChunk });
-            // Mapping URL -> cache entry: the API keys results by sha256
-            // but does not echo the source URL inside each entry. We rely
-            // on the documented invariant that the response preserves
-            // input order. If that ever changes, this mapping needs the
-            // API to attach the source URL to each result.
-            const resultEntries = Object.entries(lookupResp.results ?? {});
-            for (let i = 0; i < lookChunk.length; i++) {
-              const url = lookChunk[i];
-              const entry = resultEntries[i];
-              if (!entry) continue;
-              const [sha256, res] = entry;
+          await mapBounded(imageUrls, LOOKUP_CONCURRENCY, async (url) => {
+            try {
+              const r = await client.lookup({ images: [url] });
+              const entries = Object.entries(r.results ?? {});
+              if (entries.length === 0) return;
+              const [sha256, res] = entries[0];
               const lensesMap = res.photo?.lenses;
-              if (!lensesMap) continue;
+              if (!lensesMap) return;
               const flat: Record<string, unknown> = {};
               for (const [lensName, lensEntry] of Object.entries(lensesMap)) {
                 flat[lensName] = lensEntry.output;
               }
               urlToCache.set(url, { sha256, lensesOutput: flat });
+            } catch {
+              // Single-URL lookup failures are non-fatal: we'll fall
+              // through to analyze for that one URL.
             }
-          }
+          });
         }
 
         // Step 2: identify cache hits, mark misses for analysis.

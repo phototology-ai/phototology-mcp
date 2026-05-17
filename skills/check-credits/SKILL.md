@@ -22,10 +22,11 @@ description: Use when the user asks about their Phototology credit balance, when
    - If they pick (c), call `purchase_credits` and surface the URL.
 
 ## Estimating cost
-- `analyze_photo` with N `lenses` = N credits (1 per lens).
-- `analyze_photo` with `stack: 'full-analysis'` = ~16 credits (every lens).
+- `analyze_photo` with N `lenses` = N credits (1 per billable lens).
+- `analyze_photo` with `stack: 'full-analysis'` = one credit per billable lens in the stack. Call `list_lenses` to count the current catalog; the response's `stacks[]` entries list the lens names per stack so you can size the spend exactly. Moderation is always free and runs implicitly, so the billable count is "all lenses minus moderation."
 - `analyze_photo` with bespoke extraction = 5 credits + 1 per additional stacked lens.
 - `analyze_photo` re-running cached lenses on the same photo = 0 credits (delta billing).
+- `analyze_batch` with N photos = sum of per-photo costs, minus cache hits (which are free).
 - `lookup_photo`, `list_lenses`, `get_credits`, `purchase_credits` = 0 credits.
 
 ## Pricing facts you can quote
