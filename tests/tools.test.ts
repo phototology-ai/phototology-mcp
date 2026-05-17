@@ -50,14 +50,15 @@ describe('registerTools', () => {
     server = new McpServer({ name: 'test', version: '0.0.1' });
   });
 
-  it('registers all five tools in the expected order', () => {
+  it('registers all six tools in the expected order', () => {
     const toolSpy = jest.spyOn(server, 'registerTool');
     registerTools(server, 'pt_test_abc123');
 
-    expect(toolSpy).toHaveBeenCalledTimes(5);
+    expect(toolSpy).toHaveBeenCalledTimes(6);
     const names = toolSpy.mock.calls.map((c) => c[0]);
     expect(names).toEqual([
       'analyze_photo',
+      'analyze_batch',
       'list_lenses',
       'lookup_photo',
       'get_credits',

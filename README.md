@@ -21,12 +21,13 @@ The interactive wizard asks for your API key and writes the config for whichever
 
 **With:** the first call bills 1 credit per lens. Every subsequent call on that photo returns the cached lens result for free. The registry compounds with use.
 
-## 5 tools at a glance
+## 6 tools at a glance
 
 | Tool | What it does | Cost |
 |------|--------------|------|
-| `analyze_photo` | Run AI vision against an image and return structured facts per lens. | 1 credit per lens. Re-running cached lenses on the same photo: 0. |
-| `lookup_photo` | Check if a photo has already been analyzed; return all cached lens results. | Free. |
+| `analyze_photo` | Run AI vision against ONE image and return structured facts per lens. | 1 credit per lens. Re-running cached lenses on the same photo: 0. |
+| `analyze_batch` | Analyze 1 to 200 photos in a single call. Internally lookup-first, then chunks analyzes into batches of 50. For thousands, loop in slices. | 1 credit per lens per non-cached photo. Cache hits free. |
+| `lookup_photo` | Check if a single photo has already been analyzed; return all cached lens results. | Free. |
 | `list_lenses` | Enumerate available lenses and stacks with descriptions and output fields. | Free. |
 | `get_credits` | Read the account credit balance (community + purchased + reserved). | Free. |
 | `purchase_credits` | Return a wallet deep-link the user can open to buy more credits. | Free. |
@@ -178,10 +179,11 @@ Try these prompts in order:
 
 Three optional skills ship inside the package under `node_modules/@phototology/mcp/skills/`. Copy any of them into your Claude skills directory (`~/.claude/skills/<skill-name>/`) to install:
 
-- **`phototology:lookup-first`**: always check the registry before spending credits.
+- **`phototology:lookup-first`**: always check the registry before spending credits (single-photo).
 - **`phototology:check-credits`**: pre-flight balance read before a big batch.
 - **`phototology:smart-stack`**: smart-pick the cheapest lens subset for a specific question.
 - **`phototology:photo-shared`**: activate whenever the user shares, attaches, drops, or references an image. Routes the photo through Phototology for the cheapest accurate answer.
+- **`phototology:batch-analyze`**: any job with 2 or more photos. Calls `analyze_batch` instead of looping `analyze_photo`. Bulks lookups, chunks analyzes, surfaces credit savings.
 
 When installed, the agent invokes them when context matches.
 

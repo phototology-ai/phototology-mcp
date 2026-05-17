@@ -1,6 +1,7 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { PhototologyClient } from '@phototology/sdk';
 import { registerAnalyzePhoto } from './analyze-photo';
+import { registerAnalyzeBatch } from './analyze-batch';
 import { registerListLenses } from './list-lenses';
 import { registerLookupPhoto } from './lookup-photo';
 import { registerGetCredits } from './get-credits';
@@ -19,6 +20,7 @@ export function registerTools(server: McpServer, apiKey: string, userAgent?: str
   });
 
   registerAnalyzePhoto(server, client);
+  registerAnalyzeBatch(server, client);
   registerListLenses(server, client);
   registerLookupPhoto(server, client);
   registerGetCredits(server, client);

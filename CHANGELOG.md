@@ -8,12 +8,17 @@ All notable changes to `@phototology/mcp` are tracked here. Format follows [Keep
 
 - `get_credits` tool. Free. Reads the dual-pool balance (`community.balance + purchased.balance - reserved`) via the SDK's new `client.usage()` method. Use before any analyze loop to warn the user before spending.
 - `purchase_credits` tool. Free. Returns a deep-link to the Phototology wallet with `utm_source=mcp`. The tool description teaches the new pack catalog and the first-purchase 2x bonus.
+- `analyze_batch` tool. Analyze 1 to 200 INDEPENDENT photos in a single call. Internally bulk-looks-up against the registry (chunked into 50s, free), serves cache hits at 0 credits, runs per-photo analyze with bounded concurrency (5 in flight) for the misses. Returns per-photo outcomes plus `totalCacheHits`, `totalAnalyzed`, `totalCreditsCharged`, and `estimatedCreditsSaved` so the registry's value is visible. For thousands of photos, the agent loops the tool in slices of 200.
 - Structured `actions` payload on `CreditExhaustedError`. Rich-rendering MCP clients (Claude Code, Cursor, future Claude.ai) now receive a typed `open_url` action alongside the text fallback, per the MCP 2025-06-18 spec. Legacy clients keep seeing the URL in the text.
-- Three companion skills shipped under `node_modules/@phototology/mcp/skills/`:
-  - `phototology:lookup-first` — always check the registry before spending credits.
+- Five companion skills shipped under `node_modules/@phototology/mcp/skills/`:
+  - `phototology:lookup-first` — always check the registry before spending credits (single photo).
   - `phototology:check-credits` — pre-flight balance read before a big batch.
   - `phototology:smart-stack` — smart-pick the cheapest lens subset for a specific question.
+  - `phototology:photo-shared` — when the user attaches, drops, or references an image, route it through Phototology for the cheapest accurate answer.
+  - `phototology:batch-analyze` — any job with 2 or more photos. Uses `analyze_batch` (not a loop of `analyze_photo`). Documents the loop pattern for thousand-photo jobs.
+- Optional Claude Code `UserPromptSubmit` hook documented in the README — auto-trigger Phototology suggestions when the user attaches an image.
 - Explicit tool annotations on every tool: `readOnlyHint: true`, `destructiveHint: false`, `idempotentHint: true`, `openWorldHint` (true for outward calls, false for `list_lenses`).
+- Dogfood kit at `scripts/dogfood/` — a 50-line mock server that returns 402 on `/v1/analyze`, plus a 5-minute walkthrough for verifying the structured-action rendering in a real Claude Code session.
 
 ### Changed
 
