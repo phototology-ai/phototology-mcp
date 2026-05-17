@@ -1,11 +1,19 @@
 # @phototology/mcp Development Protocol
-> **Version:** 1.0.0 | **Architecture:** MCP stdio server wrapping @phototology/sdk | **Updated:** 2026-04-17
+> **Version:** 1.1.0 | **Architecture:** MCP stdio server wrapping @phototology/sdk | **Updated:** 2026-05-17
 
 ## What This Is
 
-Thin MCP server that exposes `@phototology/sdk` as three Model Context Protocol tools (`analyze_photo`, `list_modules`, `lookup_photo`). Published to npm; referenced in Claude Desktop / mcp.so configs. Binary: `phototology-mcp`.
+Stdio MCP server that exposes `@phototology/sdk` as five Model Context Protocol tools. Published to npm; referenced in Claude Code, Claude Desktop, Cursor, VS Code Copilot, Gemini CLI, Windsurf, Codex CLI. Binary: `phototology-mcp`.
 
-**1.0.0 breaking change (2026-04-17):** `lookup_photo` returns the new Registry v2 shape — `photo.lenses` keyed map, not `analyses[]`. `analyze_photo` accepts a new `refresh?: boolean` to bypass the per-user-per-photo projection cache.
+**1.1.0 changes (2026-05-17):**
+- Two new tools: `get_credits` (free balance read), `purchase_credits` (wallet deep-link).
+- `list_modules` renamed to `list_lenses`; response reshaped from `{ modules, presets }` to `{ lenses, stacks }`.
+- `analyze_photo` accepts `lenses: [...]` (preferred) and `stack: '...'` (preferred). The old names `modules` and `preset` work as deprecated aliases.
+- `CreditExhaustedError` now returns `structuredContent.actions` with a typed `open_url` action so rich-rendering clients can show a button.
+- Three companion skills ship in the npm package: `phototology:lookup-first`, `phototology:check-credits`, `phototology:smart-stack`.
+- Every tool declares full annotations (`readOnlyHint`, `destructiveHint: false`, `idempotentHint`, `openWorldHint`).
+
+**1.0.0 breaking change (2026-04-17):** `lookup_photo` returns the Registry v2 shape — `photo.lenses` keyed map, not `analyses[]`. `analyze_photo` accepts `refresh?: boolean` to bypass the per-user-per-photo projection cache.
 
 ## Quick Start
 
@@ -13,36 +21,59 @@ Thin MCP server that exposes `@phototology/sdk` as three Model Context Protocol 
 |---------|--------|
 | `pnpm build` | Compile to `dist/` |
 | `pnpm typecheck` | Type-check without emit |
+| `pnpm test` | Run Jest suite |
 | `PHOTOTOLOGY_API_KEY=pt_test_... node dist/index.js` | Run server locally |
 
 ## Architecture
 
-`src/index.ts` — reads `PHOTOTOLOGY_API_KEY`, creates `McpServer` with stdio transport, calls `registerTools()`.
+`src/index.ts` — reads `PHOTOTOLOGY_API_KEY`, builds the server-instructions handshake payload, creates `McpServer` with stdio transport, calls `registerTools()`.
 
-`src/tools.ts` — creates one `PhototologyClient` singleton (shared across tool calls), registers three tools:
+`src/tools.ts` — re-export shim. Real code lives under `src/tools/`:
 
-| Tool | Description |
-|------|-------------|
-| `analyze_photo` | Wraps `client.analyze()`. Args: `imageUrl`, `preset`, `modules?`, `includeEmbedding`. |
-| `list_modules` | Wraps `client.modules()`. No args. |
-| `lookup_photo` | Wraps `client.lookup()`. Args: `imageUrl?`, `sha256?`. Free, no credits. |
+| File | Purpose |
+|------|---------|
+| `src/tools/index.ts` | Barrel. Instantiates the `PhototologyClient` once and calls each per-tool register function. |
+| `src/tools/errors.ts` | `renderToolError()` + `ToolAction` type. Maps SDK errors to MCP tool-result shape, with `structuredContent.actions` on `CreditExhaustedError`. |
+| `src/tools/analyze-photo.ts` | `analyze_photo` tool. Accepts `lenses`/`stack` (preferred) or legacy `modules`/`preset`. Translates to SDK args. |
+| `src/tools/list-lenses.ts` | `list_lenses` tool. Reshapes the SDK's `{ modules, presets }` into MCP-facing `{ lenses, stacks }`. |
+| `src/tools/lookup-photo.ts` | `lookup_photo` tool. Free. |
+| `src/tools/get-credits.ts` | `get_credits` tool. Free. Wraps `client.usage()` for dual-pool balance reads. |
+| `src/tools/purchase-credits.ts` | `purchase_credits` tool. Free. Returns the wallet deep-link with `utm_source=mcp` and a structured `open_url` action. |
 
-Tools are `readOnlyHint: true`. Results return as `{ content: [{ type: 'text', text: JSON }] }`.
+Tools are `readOnlyHint: true`, `destructiveHint: false`. Successful results return `{ content: [{ type: 'text', text: JSON }] }` plus optional `structuredContent` for rich clients.
+
+## Companion Skills
+
+`skills/` ships in the npm package. Each `SKILL.md` is a self-contained markdown skill the user can copy into `~/.claude/skills/<name>/`:
+
+| Skill | When to use |
+|-------|------------|
+| `phototology:lookup-first` | Before any analyze. Always. |
+| `phototology:check-credits` | Before big batches or bespoke calls. |
+| `phototology:smart-stack` | When the user has a narrow question; picks the cheapest lens subset. |
 
 ## Key Conventions
 
 **Env var required at startup:** `PHOTOTOLOGY_API_KEY` is checked in `index.ts` before server init. Missing key writes to stderr and exits with code 1 (stdout is reserved for JSON-RPC).
 
-**Cast workaround:** `server as any` is used in `registerTools` to avoid TS2589 from complex Zod generics in the MCP SDK. This is intentional — do not remove it.
+**Cast workaround:** `server as any` is used in each `registerXxx()` function to avoid TS2589 from complex Zod generics in the MCP SDK. Intentional. Do not remove.
 
 **Optional base URL:** `PHOTOTOLOGY_BASE_URL` env var overrides the default API base (useful for local dev against `phototology-api`).
 
 **No direct dependency on `@phototology/core`:** This package imports only `@phototology/sdk`. Never bypass the SDK to call the HTTP API directly.
 
+**MCP-layer rename pattern:** `lenses`/`stack` are the preferred argument names on `analyze_photo` and the preferred response keys on `list_lenses`. The SDK still uses `modules` and `preset` internally; the MCP translates. New code should use the new names; old code keeps working during the 90-day deprecation window.
+
+**Pricing model surfaced everywhere** (server instructions, tool descriptions, skills, README): 1 credit = $0.01 per lens per photo. Lookups free. Bespoke 5 credits per image plus 1 per stacked lens. Moderation free + always-on. Cache hits free. 1,000 community credits per month per account (no card, no rollover). Packs at 1k/$10, 10k/$100, 100k/$1,000. First-purchase 2x bonus. No subscriptions.
+
 ## Phantom Patterns
 
 | Pattern | Reality |
 |---------|---------|
-| More than 3 tools | Only `analyze_photo`, `list_modules`, and `lookup_photo` |
+| More than 5 tools | Five: `analyze_photo`, `list_lenses`, `lookup_photo`, `get_credits`, `purchase_credits` |
+| `list_modules` is a tool | Renamed to `list_lenses` in 1.1.0. No back-compat alias for the tool name. |
+| `modules` / `preset` are removed | Still accepted as deprecated aliases on `analyze_photo`. Prefer `lenses` / `stack`. |
 | `McpServer` constructed with auth config | Auth is handled by the SDK (`apiKey` in client config) |
-| SSE or HTTP transport | Stdio only |
+| SSE or HTTP transport | Stdio only. Remote MCP is a follow-up, not in 1.1.0. |
+| Stripe checkout completes inside MCP | Cannot. `purchase_credits` returns a wallet URL the user must open. |
+| PostHog instrumentation inside the MCP server | Reverted in `bc021f96`. API-side captures `client_type=mcp` from the `User-Agent` header. |
