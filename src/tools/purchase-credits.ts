@@ -33,7 +33,7 @@ export function registerPurchaseCredits(server: McpServer): void {
         '',
         'First purchase doubles. A user buying for the first time receives 2x credits on their first pack (Starter $10 → 2,000 credits the first time). Mention this when surfacing the URL if the user has never bought before.',
         '',
-        'No subscriptions. Pay-as-you-go via packs only. Every account also gets 1,000 free community credits per month (no card required), which `get_credits` shows under `community.balance`.',
+        'No subscriptions. Pay-as-you-go via packs only. New accounts start with 5,000 free credits via the signup ladder: 1,000 for verifying an email and 4,000 more for adding a card-on-file (Stripe holds the card; Phototology never charges it without a separate purchase). The signup-grant credits are one-time, not recurring.',
         '',
         'Returns: `{ url }`. The `structuredContent.actions[0]` is an `open_url` action so rich-rendering clients show it as a button.',
       ].join('\n'),
