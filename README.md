@@ -41,9 +41,9 @@ The interactive wizard asks for your API key and writes the config for whichever
 ## Pricing
 
 - **1 credit = $0.01 = one lens run on one photo.** Stack five lenses on a photo = 5 credits = $0.05.
-- **Every account gets 1,000 community credits / month, free, no card required.** Spent first. Resets monthly. No rollover.
+- **New users start with 5,000 free credits.** 1,000 land when you verify your email; the other 4,000 land when you add a card-on-file. Stripe holds the card; Phototology never charges it without a separate purchase.
 - **Lookups, lens discovery, balance reads, and purchase links are always free.**
-- **Cache hits cost zero.** Re-running the same lens on the same photo returns the cached output for free.
+- **Cache hits cost zero.** Re-running the same lens on the same photo returns the cached output for free. The registry keeps re-runs free across sessions.
 - **Bespoke schema extraction = 5 credits per image** (plus 1 per additional stacked lens).
 - **Moderation is free and always-on.** It's safety infrastructure, never billed.
 

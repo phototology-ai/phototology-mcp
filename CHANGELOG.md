@@ -2,6 +2,12 @@
 
 All notable changes to `@phototology/mcp` are tracked here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning follows [SemVer](https://semver.org/).
 
+## [1.1.1] — 2026-05-17
+
+### Changed
+
+- Update server instructions, README, and `phototology:check-credits` skill to reflect the pricing v1 launch: 5,000-credit signup ladder (1,000 for verifying an email + 4,000 for adding a card-on-file) replaces the prior 1,000/month community grant. Pack table ($10 / $100 / $1,000 for 1,000 / 10,000 / 100,000 credits), $/credit, and the first-purchase 2x bonus are unchanged. `buildServerInstructions` is now exported for testability.
+
 ## [1.1.0] — 2026-05-17
 
 ### Added

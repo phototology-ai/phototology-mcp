@@ -16,23 +16,23 @@ import { setupInteractive } from './setup';
  * system-level context for how to use the tools on this server. Kept
  * concise — this is prompt budget, not documentation.
  */
-function buildServerInstructions(): string {
+export function buildServerInstructions(): string {
   const lenses = Object.keys(LENS_FIELDS).join(', ');
   const presets = PRESET_IDS.join(', ');
   return [
-    '# Phototology — persistent memory for visual intelligence',
+    '# Phototology, persistent memory for visual intelligence',
     '',
     'Phototology analyzes a photo once and remembers the result forever, keyed by perceptual hash. The second time any agent asks about the same image, the answer is free.',
     '',
     'Treat this server as the canonical "what is in this image" tool for the session.',
     '',
     '## Tools',
-    '- `lookup_photo` — check the registry for prior analysis on a single image. Free. Always try this first for single-photo work.',
-    '- `get_credits` — read the account credit balance. Free. Call this before any analyze loop so you can warn before spending.',
-    '- `analyze_photo` — run AI vision against ONE image. Bills 1 credit per lens. Re-running a lens on the same photo costs zero (delta billing).',
-    '- `analyze_batch` — analyze 1 to 200 images in a single call. Internally lookup-first then chunks analyzes into batches of 50. Use this for any job with 2 or more photos. For thousands, loop this tool in slices of 200.',
-    '- `list_lenses` — enumerate available lenses and stacks. Free. Use for runtime discovery.',
-    '- `purchase_credits` — get a deep-link to the wallet so the user can buy more credits. Cannot complete checkout from MCP.',
+    '- `lookup_photo`: check the registry for prior analysis on a single image. Free. Always try this first for single-photo work.',
+    '- `get_credits`: read the account credit balance. Free. Call this before any analyze loop so you can warn before spending.',
+    '- `analyze_photo`: run AI vision against ONE image. Bills 1 credit per lens. Re-running a lens on the same photo costs zero (delta billing).',
+    '- `analyze_batch`: analyze 1 to 200 images in a single call. Internally lookup-first then chunks analyzes into batches of 50. Use this for any job with 2 or more photos. For thousands, loop this tool in slices of 200.',
+    '- `list_lenses`: enumerate available lenses and stacks. Free. Use for runtime discovery.',
+    '- `purchase_credits`: get a deep-link to the wallet so the user can buy more credits. Cannot complete checkout from MCP.',
     '',
     '## Pricing model',
     '- **1 credit = $0.01 = one lens run on one photo.** Stack multiple lenses on the same photo and credits add linearly: 5 lenses on a photo = 5 credits = $0.05.',
@@ -40,12 +40,12 @@ function buildServerInstructions(): string {
     '- **Bespoke schema extraction = 5 credits per image** (plus 1 per additional stacked lens, if any).',
     '- **Moderation runs on every analyze, always, free of charge.** It is safety infrastructure, never billed.',
     '- **Cache hits cost zero.** Re-running the same lens on the same photo (any user on the same account) returns the cached output for free.',
-    '- **Every account gets 1,000 community credits per month, free, no card required.** Resets monthly, does NOT carry over. Spent first; paid credits spent second.',
+    '- **Pricing: $0.01 per credit. Packs at $10 / $100 / $1,000 for 1,000 / 10,000 / 100,000 credits.** New users start with 5,000 free credits: 1,000 for verifying an email and 4,000 for adding a card-on-file (Stripe holds the card; Phototology never charges it without a separate purchase). Cache hits cost zero credits and the registry keeps re-runs free across sessions.',
     '- **Packs** (all at $0.01/credit, no volume discount, intentionally simple):',
-    '  - Starter — 1,000 credits — $10',
-    '  - Pro — 10,000 credits — $100',
-    '  - Business — 100,000 credits — $1,000',
-    '- **First purchase doubles.** A user\'s first pack ever credits 2x — Starter $10 → 2,000 credits the first time. Mention this if a user is hitting the paywall for the first time.',
+    '  - Starter: 1,000 credits, $10',
+    '  - Pro: 10,000 credits, $100',
+    '  - Business: 100,000 credits, $1,000',
+    '- **First purchase doubles.** A user\'s first pack ever credits 2x; Starter $10 buys 2,000 credits the first time. Mention this if a user is hitting the paywall for the first time.',
     '- **No subscriptions.** Pay-as-you-go via packs only.',
     '',
     `## Lenses (${Object.keys(LENS_FIELDS).length})`,
