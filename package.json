@@ -5,11 +5,12 @@
   "license": "MIT",
   "homepage": "https://phototology.com",
   "bugs": {
-    "url": "https://github.com/phototology-ai/phototology-mcp/issues"
+    "url": "https://github.com/phototology-ai/phototology/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/phototology-ai/phototology-mcp.git"
+    "url": "git+https://github.com/phototology-ai/phototology.git",
+    "directory": "packages/mcp"
   },
   "keywords": [
     "phototology",
